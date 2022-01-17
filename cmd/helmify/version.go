@@ -6,7 +6,7 @@ import (
 
 // these information will be collected when build, by `-ldflags "-X main.version=0.1"`.
 var (
-	version = "development"
+	version = "kyligence customized"
 	date    = "not set"
 	commit  = "not set"
 )
