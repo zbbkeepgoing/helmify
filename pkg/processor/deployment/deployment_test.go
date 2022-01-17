@@ -1,6 +1,7 @@
 package deployment
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/arttor/helmify/pkg/metadata"
@@ -91,6 +92,41 @@ spec:
         secret:
           secretName: my-operator-secret-ca
 `
+
+	strDeplPodAnnotations = `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    control-plane: controller-manager
+  name: my-operator-controller-manager
+  namespace: my-operator-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      control-plane: controller-manager
+  template:
+    metadata:
+      labels:
+        control-plane: controller-manager
+      annotations:
+        kubectl.kubernetes.io/default-container: manager
+    spec:
+      containers:
+      - args:
+        - --health-probe-bind-address=:8081
+        - --metrics-bind-address=127.0.0.1:8080
+        - --leader-elect
+        command:
+        - /manager
+        volumeMounts:
+        - mountPath: /controller_manager_config.yaml
+          name: manager-config
+          subPath: controller_manager_config.yaml
+        - name: secret-volume
+          mountPath: /my.ca
+        image: controller:latest
+`
 )
 
 func Test_deployment_Process(t *testing.T) {
@@ -107,5 +143,12 @@ func Test_deployment_Process(t *testing.T) {
 		processed, _, err := testInstance.Process(&metadata.Service{}, obj)
 		assert.NoError(t, err)
 		assert.Equal(t, false, processed)
+	})
+	t.Run("processed_pod_annotation", func(t *testing.T) {
+		obj := internal.GenerateObj(strDeplPodAnnotations)
+		processed, r, err := testInstance.Process(&metadata.Service{}, obj)
+		assert.NoError(t, err)
+		assert.Equal(t, true, processed)
+		fmt.Printf("%v", r)
 	})
 }

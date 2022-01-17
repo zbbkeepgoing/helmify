@@ -103,6 +103,9 @@ func (d deployment) Process(appMeta helmify.AppMetadata, obj *unstructured.Unstr
 			return true, nil, err
 		}
 	}
+	if len(podAnnotations) != 0 {
+		podAnnotations = "\n" + podAnnotations
+	}
 
 	nameCamel := strcase.ToLowerCamel(name)
 	podValues, err := processPodSpec(nameCamel, appMeta, &depl.Spec.Template.Spec)
