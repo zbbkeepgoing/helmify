@@ -64,7 +64,9 @@ func (w wh) Process(appMeta helmify.AppMetadata, obj *unstructured.Unstructured)
 	if err != nil {
 		return true, nil, errors.Wrap(err, "unable get webhook certName")
 	}
-	certName = strings.TrimPrefix(certName, appMeta.Namespace()+"/"+appMeta.Namespace()+"-")
+	// certName = strings.TrimPrefix(certName, appMeta.Namespace()+"/"+appMeta.Namespace()+"-")
+	certName = strings.TrimPrefix(certName, appMeta.Namespace()+"/")
+	certName = appMeta.TrimName(certName)
 	res := fmt.Sprintf(whTempl, appMeta.ChartName(), name, certName, string(webhooks))
 	return true, &whResult{
 		name: name,
