@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"github.com/arttor/helmify/pkg/processor/job"
 	"io"
 	"os"
 	"os/signal"
@@ -46,6 +47,7 @@ func Start(input io.Reader, config config.Config) error {
 		configmap.New(),
 		crd.New(),
 		deployment.New(),
+		job.New(),
 		storage.New(),
 		service.New(),
 		service.NewIngress(),
